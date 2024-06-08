@@ -1,17 +1,42 @@
 import { useState } from "react";
 import "./App.css";
 import ReportViewer from "./components/ReportViewer";
+
 function App() {
   const [url, setUrl] = useState("");
   const [report, setReport] = useState(null);
-  const handleclick = async () => {
-    const response = await fetch("https://web-analyzer-backend-1.onrender.com/api/audit", {
-      method: "POST",
-      body: JSON.stringify({ url }),
-      headers: { "Content-Type": "application/json" },
-    });
-    const data = await response.json();
-    setReport(data);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = async () => {
+    setError(null);
+    setReport(null);
+    setLoading(true);
+    
+    if (!url || !url.match(/^(http|https):\/\/[^ "]+$/)) {
+      setError("Please enter a valid URL.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("https://web-analyzer-backend-1.onrender.com/api/audit", {
+        method: "POST",
+        body: JSON.stringify({ url }),
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      setReport(data);
+    } catch (error) {
+      setError("Failed to fetch the report. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -25,16 +50,15 @@ function App() {
             placeholder="Enter your URL here"
             onChange={(e) => setUrl(e.target.value)}
           />
-          <label className="absolute top-0 left-4 -mt-6 text-xs text-gray-500"></label>
           <button
             className="mt-4 lg:mt-0 lg:ml-4 px-6 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-400"
-            onClick={() => {
-              handleclick();
-            }}
+            onClick={handleClick}
+            disabled={loading}
           >
-            Analyze website
+            {loading ? "Analyzing..." : "Analyze website"}
           </button>
         </div>
+        {error && <div className="text-red-500 mt-4">{error}</div>}
       </div>
       <div className="content">
         {report && <ReportViewer report={report} />}
