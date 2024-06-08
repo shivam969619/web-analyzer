@@ -5,7 +5,7 @@ function App() {
   const [url, setUrl] = useState("");
   const [report, setReport] = useState(null);
   const handleclick = async () => {
-    const response = await fetch("https://web-analyzer-backend-1.onrender.com/", {
+    const response = await fetch("https://web-analyzer-backend-1.onrender.com/api/audit", {
       method: "POST",
       body: JSON.stringify({ url }),
       headers: { "Content-Type": "application/json" },
