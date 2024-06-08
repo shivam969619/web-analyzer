@@ -27,13 +27,14 @@ function App() {
       });
       
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        const errorText = await response.text();
+        throw new Error(errorText || "Network response was not ok");
       }
 
       const data = await response.json();
       setReport(data);
     } catch (error) {
-      setError("Failed to fetch the report. Please try again.");
+      setError(`Failed to fetch the report. Please try again. ${error.message}`);
     } finally {
       setLoading(false);
     }
