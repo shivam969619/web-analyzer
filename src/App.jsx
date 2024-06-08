@@ -5,7 +5,7 @@ function App() {
   const [url, setUrl] = useState("");
   const [report, setReport] = useState(null);
   const handleclick = async () => {
-    const response = await fetch("https://web-analyzer-backend.vercel.app/", {
+    const response = await fetch("https://localhost/3000/api/audit", {
       method: "POST",
       body: JSON.stringify({ url }),
       headers: { "Content-Type": "application/json" },
